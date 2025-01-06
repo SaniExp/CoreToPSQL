@@ -1,0 +1,109 @@
+CREATE TABLE blockheader (
+    indexnum INT,
+    blockheight INT UNIQUE,
+    blockhash TEXT,
+    time INT,
+    timeutc TIMESTAMP,
+    mediantime INT,
+    epoch INT,
+    epochsubsidy NUMERIC(10, 0),
+    blocksubsidy NUMERIC(10, 0),
+    transactionscount INT,
+    vincount INT,
+    vinvalue NUMERIC(15, 0),
+    voutcount INT,
+    voutvalue NUMERIC(15, 0),
+    fees NUMERIC(15, 0),
+    strippedsize INT,
+    size INT,
+    weight INT,
+    version TEXT,
+    versionhex TEXT,
+    merkleroot TEXT,
+    bits TEXT,
+    chainwork TEXT,
+    difficulty TEXT,
+    nonce TEXT,
+    coinbasescriptsig TEXT,
+    sequence TEXT,
+    extranonce TEXT,
+    extranoncereversed TEXT,
+    extranoncedecimal TEXT
+);
+
+CREATE TABLE txnheader (
+    indexnum INT,
+    blockheight INT,
+    transactionid TEXT,
+    transactionindex INT,
+    iscoinbase BOOLEAN DEFAULT FALSE,
+    coinbasemsg TEXT,
+    sequence TEXT,
+    vincount INT,
+    vinvalue NUMERIC(15, 0),
+    voutcount INT,
+    voutvalue NUMERIC(15, 0),
+    fees NUMERIC(15, 0),
+    virtualsize_vb INT,
+    weight_wu INT,
+    CONSTRAINT unique_block_txid UNIQUE (blockheight, transactionid)
+);
+
+CREATE TABLE inputs (
+    indexnum INT,
+    blockheight INT,
+    transactionindex INT,
+    transactionid TEXT,
+    iscoinbase BOOLEAN DEFAULT FALSE,
+    vin INT,
+    origintransactionid TEXT,
+    originvout INT,
+    coinbasemsg TEXT,
+    sequence TEXT,
+    scriptsig TEXT,
+    scriptwitness TEXT
+);
+
+CREATE TABLE outputs (
+    indexnum INT,
+    blockheight INT,
+    transactionindex INT,
+    transactionid TEXT,
+    fromcoinbase BOOLEAN DEFAULT FALSE,
+    vout INT,
+    address TEXT,
+    amount NUMERIC(15, 0),
+    scripttype TEXT,
+    asm TEXT,
+    descriptor TEXT,
+    scripthex TEXT,
+    isspent BOOLEAN DEFAULT FALSE,
+    isspendable BOOLEAN DEFAULT TRUE,
+    spendingblock INT,
+    spendingtxnid TEXT,
+    spendingvin INT,
+    spendingscript TEXT,
+    spendingwitness TEXT
+);
+
+
+-- Inputs table indexes
+CREATE INDEX idx_inputs_blockheight ON inputs (blockheight);
+CREATE INDEX idx_inputs_origintransactionid ON inputs (origintransactionid);
+CREATE INDEX idx_inputs_originvout ON inputs (originvout);
+
+
+-- Outputs table indexes
+CREATE INDEX idx_outputs_blockheight ON outputs (blockheight);
+CREATE INDEX idx_outputs_address ON outputs (address);
+CREATE INDEX idx_outputs_vout ON outputs (vout);
+CREATE INDEX idx_outputs_transactionid ON outputs (transactionid);
+CREATE INDEX idx_outputs_isspendable ON outputs (isspendable);
+CREATE INDEX idx_outputs_isspent ON outputs (isspent);
+CREATE INDEX idx_outputs_spendingblockheight ON outputs (spendingblock);
+CREATE INDEX idx_outputs_spendingtransactionid ON outputs (spendingtxnid);
+
+-- Transactions table indexes
+CREATE INDEX idx_txnheader_transactionid ON txnheader (transactionid);
+CREATE INDEX idx_txnheader_blockheight ON txnheader (blockheight);
+CREATE INDEX idx_txnheader_iscoinbase ON txnheader (iscoinbase);
